@@ -5,16 +5,16 @@ from datetime import datetime
 import time
 import pandas as pd
 
-# แก้ไขตัวสะกดตรงนี้ให้ถูกต้องแล้วครับ
+# 1. การตั้งค่าหน้าจอ
+st.set_page_config(page_title="Space of Us", page_icon="💝", layout="centered")
+
+# ตรวจสอบ Library
 try:
     from streamlit_gsheets import GSheetsConnection
 except ImportError:
-    st.error("ระบบกำลังติดตั้งตัวเชื่อมต่อ Google Sheets... โปรดรอสักครู่แล้ว Refresh หน้าจอครับ")
+    st.error("กำลังติดตั้งระบบเชื่อมต่อ Google Sheets... หากค้างนานเกินไปให้กด Refresh ครับ")
 
-# --- 1. การตั้งค่าหน้าจอ ---
-st.set_page_config(page_title="Space of Us", page_icon="💝", layout="centered")
-
-# --- 2. ฟังก์ชันจัดการพื้นหลัง ---
+# 2. ฟังก์ชันจัดการพื้นหลัง
 def get_base64_of_bin_file(bin_file):
     if os.path.exists(bin_file):
         with open(bin_file, 'rb') as f:
@@ -40,7 +40,7 @@ def set_bg_and_style(bg_file):
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
 
-# --- 3. หน้า LOGIN ---
+# 3. หน้า LOGIN
 if not st.session_state.authenticated:
     set_bg_and_style("bg_login.png")
     st.markdown('<div style="height: 150px;"></div>', unsafe_allow_html=True)
@@ -55,7 +55,7 @@ if not st.session_state.authenticated:
                 st.error("รหัสผิดนะเจ้าอ้วน")
     st.stop()
 
-# --- 4. จัดการสถานะเมนู ---
+# 4. จัดการสถานะเมนู
 if 'menu' not in st.session_state:
     st.session_state.menu = None
 
@@ -89,9 +89,6 @@ if st.session_state.menu:
                     <div style="color:#CCC;">:</div>
                     <div style="color:#FF4B4B;">{s:02d}<br><span style="font-size:10px; color:#555;">SEC</span></div>
                 </div>
-                <div style="margin-top:20px; padding:15px; background:#F0F8FF; border-radius:15px; border:1px dashed #007BFF; color:#333; font-size:16px;">
-                    "อยู่ด้วยกันมาจะครบปีแล้วนะไอ่หมูอ้วน <br> อยู่ต่อ อยู่อีก ห้ามหนี ห้ามทิ้ง รักบี๋ที่สุดๆๆ ❤️"
-                </div>
             </div>
             """
             clock_holder.markdown(my_html, unsafe_allow_html=True)
@@ -113,19 +110,22 @@ if st.session_state.menu:
         
         def get_opened_data():
             try:
-                df = conn.read(ttl=0)
+                # อ่านจากแผ่นที่ชื่อว่า GiftStatus (หรือ Sheet1)
+                df = conn.read(worksheet="GiftStatus", ttl=0)
                 return dict(zip(df['box_id'], df['gift_index']))
             except:
                 return {}
 
         def save_opened_data(box_id, gift_idx):
             try:
-                existing_df = conn.read(ttl=0)
-            except:
-                existing_df = pd.DataFrame(columns=['box_id', 'gift_index'])
-            new_row = pd.DataFrame([{"box_id": box_id, "gift_index": gift_idx}])
-            updated_df = pd.concat([existing_df, new_row], ignore_index=True)
-            conn.update(data=updated_df)
+                existing_df = conn.read(worksheet="GiftStatus", ttl=0)
+                new_row = pd.DataFrame([{"box_id": box_id, "gift_index": gift_idx}])
+                updated_df = pd.concat([existing_df, new_row], ignore_index=True)
+                # ระบุ worksheet ให้ชัดเจนเพื่อป้องกันสิทธิ์
+                conn.update(worksheet="GiftStatus", data=updated_df)
+                st.balloons()
+            except Exception as e:
+                st.error(f"บันทึกไม่สำเร็จ: {e}")
 
         opened_status = get_opened_data()
         today = datetime.now().date()
@@ -150,11 +150,9 @@ if st.session_state.menu:
                         if today >= target_date:
                             if st.button(f"🎁 {box_labels[i]}", key=f"gift_{box_id}", use_container_width=True):
                                 save_opened_data(box_id, current_count)
-                                st.balloons()
                                 st.rerun()
                         else:
                             st.button(f"🔒 {box_labels[i]}", key=f"lock_{box_id}", disabled=True, use_container_width=True)
-
     else:
         st.info(f"หน้า {st.session_state.menu} กำลังรอข้อมูลครับ")
 
