@@ -5,13 +5,14 @@ from datetime import datetime
 import time
 import pandas as pd
 
-# 1. ตั้งค่าหน้าจอและหน้าตาแอป
+# 1. การตั้งค่าหน้าจอ
 st.set_page_config(page_title="Space of Us", page_icon="💝", layout="centered")
 
+# ตรวจสอบ Library สำหรับ Google Sheets
 try:
     from streamlit_gsheets import GSheetsConnection
 except ImportError:
-    st.error("กำลังเตรียมระบบ... กรุณารอสักครู่ครับ")
+    st.error("กำลังติดตั้งระบบ... หากค้างนานเกินไปให้กด Refresh ครับ")
 
 def get_base64_of_bin_file(bin_file):
     if os.path.exists(bin_file):
@@ -38,13 +39,13 @@ def set_bg_and_style(bg_file):
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
 
-# 2. ส่วนของหน้า LOGIN
+# 2. หน้า LOGIN
 if not st.session_state.authenticated:
     set_bg_and_style("bg_login.png")
     st.markdown('<div style="height: 150px;"></div>', unsafe_allow_html=True)
     col_l, col_mid, col_r = st.columns([1, 2, 1])
     with col_mid:
-        password = st.text_input("", type="password", placeholder="รหัสผ่านจ้า", key="login_final")
+        password = st.text_input("", type="password", placeholder="รหัสผ่านจ้า", key="login_v_final")
         if st.button("เข้าสู่ระบบ 🤍", use_container_width=True):
             if password == "1234":
                 st.session_state.authenticated = True
@@ -53,7 +54,7 @@ if not st.session_state.authenticated:
                 st.error("รหัสผิดนะเจ้าอ้วน")
     st.stop()
 
-# 3. จัดการเมนูหลัก
+# 3. จัดการสถานะเมนู
 if 'menu' not in st.session_state:
     st.session_state.menu = None
 
@@ -64,87 +65,93 @@ if st.session_state.menu:
         st.rerun()
     st.divider()
 
-    # --- เมนู TANG'S GIFT (ส่วนที่เชื่อมต่อ Google Sheets) ---
-    if st.session_state.menu == "gift":
+    # --- หน้า 365 DAYS (แบบเดิมที่บี๋ต้องการ) ---
+    if st.session_state.menu == "365days":
+        clock_holder = st.empty()
+        target = datetime(2027, 2, 14, 0, 0, 0)
+        while st.session_state.menu == "365days":
+            diff = target - datetime.now()
+            if diff.total_seconds() <= 0:
+                clock_holder.markdown("<h1 style='text-align:center;'>Happy Anniversary! 💖</h1>", unsafe_allow_html=True)
+                break
+            d, h, m, s = diff.days, diff.seconds//3600, (diff.seconds//60)%60, diff.seconds%60
+            my_html = f"""
+            <div style="text-align:center; background:rgba(255,255,255,0.85); padding:30px; border-radius:30px; box-shadow:0 10px 25px rgba(0,0,0,0.1); margin:auto;">
+                <p style="color:#FF4B4B; font-weight:bold; letter-spacing:1px; margin-bottom:15px;">COUNTING DOWN TO OUR DAY</p>
+                <div style="font-size:40px; font-weight:bold; font-family:monospace; display:flex; justify-content:center; gap:10px; color:#007BFF;">
+                    <div>{d:02d}<br><span style="font-size:10px; color:#555;">DAYS</span></div>
+                    <div style="color:#CCC;">:</div>
+                    <div>{h:02d}<br><span style="font-size:10px; color:#555;">HRS</span></div>
+                    <div style="color:#CCC;">:</div>
+                    <div>{m:02d}<br><span style="font-size:10px; color:#555;">MIN</span></div>
+                    <div style="color:#CCC;">:</div>
+                    <div style="color:#FF4B4B;">{s:02d}<br><span style="font-size:10px; color:#555;">SEC</span></div>
+                </div>
+            </div>
+            """
+            clock_holder.markdown(my_html, unsafe_allow_html=True)
+            time.sleep(1)
+
+    # --- หน้า TANG'S GIFT (เวอร์ชันเชื่อมต่อ Google Sheets ล่าสุด) ---
+    elif st.session_state.menu == "gift":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎁 Tang's Gift</h2>", unsafe_allow_html=True)
-        
-        # รายการของขวัญ
         gift_sequence = [
             {"date": "2024-02-14", "image": "gift1.jpg", "text": "ชิ้นที่ 1: รักบี๋ที่สุดในโลก! ❤️"},
             {"date": "2024-05-20", "image": "gift2.jpg", "text": "ชิ้นที่ 2: ของขวัญเซอร์ไพรส์จ้า ✨"},
             {"date": "2024-08-12", "image": "gift3.jpg", "text": "ชิ้นที่ 3: คนเก่งของเค้า 💖"},
             {"date": "2024-12-25", "image": "gift4.jpg", "text": "ชิ้นที่ 4: คริสต์มาสนี้มีแค่เรา 🎄"}
         ]
-
-        # เชื่อมต่อกับ Google Sheets แผ่นงานชื่อ GiftStatus
         conn = st.connection("gsheets", type=GSheetsConnection)
         
         def get_opened_data():
             try:
-                # อ่านข้อมูลจาก Google Sheets (Worksheet: GiftStatus)
                 df = conn.read(worksheet="GiftStatus", ttl=0)
                 return dict(zip(df['box_id'], df['gift_index']))
-            except Exception:
-                return {}
+            except: return {}
 
         def save_opened_data(box_id, gift_idx):
             try:
-                # ดึงข้อมูลเดิมมาอัปเดต
                 existing_df = conn.read(worksheet="GiftStatus", ttl=0)
                 new_row = pd.DataFrame([{"box_id": box_id, "gift_index": gift_idx}])
-                if existing_df is not None:
-                    updated_df = pd.concat([existing_df, new_row], ignore_index=True)
-                else:
-                    updated_df = new_row
-                
-                # บันทึกกลับไปยัง Google Sheets
+                updated_df = pd.concat([existing_df, new_row], ignore_index=True) if existing_df is not None else new_row
                 conn.update(worksheet="GiftStatus", data=updated_df)
                 st.balloons()
-                st.success("บันทึกความทรงจำเรียบร้อยแล้ว!")
-                time.sleep(1)
-            except Exception as e:
-                st.error(f"บันทึกไม่สำเร็จ: {e}")
+            except Exception as e: st.error(f"บันทึกไม่สำเร็จ: {e}")
 
         opened_status = get_opened_data()
         today = datetime.now().date()
         cols = st.columns(2)
         box_labels = ["กล่องสีแดง 🎈", "กล่องสีฟ้า 💎", "กล่องสีทอง 🏆", "กล่องสีชมพู 🎀"]
-
         for i in range(4):
             b_id = f"box_{i+1}"
             with cols[i % 2]:
                 if b_id in opened_status:
                     idx = int(opened_status[b_id])
                     info = gift_sequence[idx]
-                    if os.path.exists(info['image']):
-                        st.image(info['image'], caption=info['text'], use_container_width=True)
-                    else:
-                        st.success(f"🎉 {info['text']}")
+                    if os.path.exists(info['image']): st.image(info['image'], caption=info['text'], use_container_width=True)
+                    else: st.success(f"🎉 {info['text']}")
                 else:
-                    opened_count = len(opened_status)
-                    if opened_count < len(gift_sequence):
-                        g_info = gift_sequence[opened_count]
-                        g_date = datetime.strptime(g_info['date'], "%Y-%m-%d").date()
+                    count = len(opened_status)
+                    if count < len(gift_sequence):
+                        g_date = datetime.strptime(gift_sequence[count]['date'], "%Y-%m-%d").date()
                         if today >= g_date:
-                            if st.button(f"🎁 {box_labels[i]}", key=f"btn_{b_id}", use_container_width=True):
-                                save_opened_data(b_id, opened_count)
+                            if st.button(f"🎁 {box_labels[i]}", key=f"gift_{b_id}", use_container_width=True):
+                                save_opened_data(b_id, count)
                                 st.rerun()
-                        else:
-                            st.button(f"🔒 {box_labels[i]}", disabled=True, use_container_width=True)
-
-    # --- เมนู 365 DAYS ---
-    elif st.session_state.menu == "365days":
-        target = datetime(2027, 2, 14, 0, 0, 0)
-        diff = target - datetime.now()
-        d, h, m, s = diff.days, diff.seconds//3600, (diff.seconds//60)%60, diff.seconds%60
-        st.metric("Counting down to our day", f"{d} Days {h:02d}:{m:02d}:{s:02d}")
+                        else: st.button(f"🔒 {box_labels[i]}", key=f"l_{b_id}", disabled=True, use_container_width=True)
 
 else:
-    # หน้า DASHBOARD หลัก
+    # 4. หน้า DASHBOARD หลัก
     set_bg_and_style("bg_dashboard.png")
-    st.markdown("<h3 style='text-align: center; color: white;'>ของขวัญสำหรับคนเก่ง 💖</h3>", unsafe_allow_html=True)
+    st.markdown("<br><h3 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>ของขวัญสำหรับคนเก่ง 💖</h3>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("Tang's Gift"): st.session_state.menu = "gift"; st.rerun()
+        if os.path.exists("gift.jpg"): st.image("gift.jpg", use_container_width=True)
+        if st.button("🎁 Tang's Gift", use_container_width=True):
+            st.session_state.menu = "gift"
+            st.rerun()
     with c2:
-        if st.button("365 Days"): st.session_state.menu = "365days"; st.rerun()
+        if os.path.exists("365days.jpg"): st.image("365days.jpg", use_container_width=True)
+        if st.button("📅 365 Days", use_container_width=True):
+            st.session_state.menu = "365days"
+            st.rerun()
