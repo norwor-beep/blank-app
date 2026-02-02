@@ -4,6 +4,8 @@ import base64
 from datetime import datetime
 import time
 import pandas as pd
+
+# แก้ไขตัวสะกดตรงนี้ให้ถูกต้องแล้วครับ
 try:
     from streamlit_gsheets import GSheetsConnection
 except ImportError:
@@ -97,10 +99,8 @@ if st.session_state.menu:
 
     # --- หน้า TANG'S GIFT (เชื่อมต่อ Google Sheets) ---
     elif st.session_state.menu == "gift":
-        #from streamlit_gsheets import GSheetsConnection  # เช็คตัวสะกดขีดล่าง (_) ให้ดีครับ
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎁 Tang's Gift</h2>", unsafe_allow_html=True)
         
-        # 1. ลำดับของรางวัล (บี๋แก้ตรงนี้)
         gift_sequence = [
             {"date": "2024-02-14", "image": "gift1.jpg", "text": "ชิ้นที่ 1: รักบี๋ที่สุดในโลก! ❤️"},
             {"date": "2024-05-20", "image": "gift2.jpg", "text": "ชิ้นที่ 2: ของขวัญเซอร์ไพรส์จ้า ✨"},
@@ -108,7 +108,7 @@ if st.session_state.menu:
             {"date": "2024-12-25", "image": "gift4.jpg", "text": "ชิ้นที่ 4: คริสต์มาสนี้มีแค่เรา 🎄"}
         ]
 
-        # 2. เชื่อมต่อ Google Sheets
+        # เชื่อมต่อ Google Sheets
         conn = st.connection("gsheets", type=GSheetsConnection)
         
         def get_opened_data():
@@ -159,7 +159,7 @@ if st.session_state.menu:
         st.info(f"หน้า {st.session_state.menu} กำลังรอข้อมูลครับ")
 
 else:
-    # --- 5. หน้า DASHBOARD หลัก (6 ปุ่ม) ---
+    # --- 5. หน้า DASHBOARD หลัก ---
     set_bg_and_style("bg_dashboard.png")
     st.markdown("""
         <style>
