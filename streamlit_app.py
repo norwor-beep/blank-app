@@ -73,7 +73,7 @@ if st.session_state.menu:
         st.rerun()
     st.divider()
 
-    # --- หน้า 365 DAYS (นาฬิกาดีไซน์เดิม) ---
+    # --- หน้า 365 DAYS ---
     if st.session_state.menu == "365days":
         clock_holder = st.empty()
         target = datetime(2027, 2, 14, 0, 0, 0)
@@ -97,10 +97,9 @@ if st.session_state.menu:
             clock_holder.markdown(my_html, unsafe_allow_html=True)
             time.sleep(1)
 
-    # --- หน้า TANG'S GIFT (ระบบบันทึกแบบไฟล์) ---
+    # --- หน้า TANG'S GIFT ---
     elif st.session_state.menu == "gift":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎁 Tang's Gift</h2>", unsafe_allow_html=True)
-        # บี๋แก้วันที่เปิดกล่องตรงนี้จ้า
         gift_sequence = [
             {"date": "2024-02-14", "image": "gift1.jpg", "text": "ชิ้นที่ 1: รักบี๋ที่สุดในโลก! ❤️"},
             {"date": "2024-05-20", "image": "gift2.jpg", "text": "ชิ้นที่ 2: ของขวัญเซอร์ไพรส์จ้า ✨"},
@@ -127,27 +126,26 @@ if st.session_state.menu:
                         g_date = datetime.strptime(gift_sequence[count]['date'], "%Y-%m-%d").date()
                         if today >= g_date:
                             if st.button(f"🎁 {box_labels[i]}", key=f"g_{b_id}", use_container_width=True):
-                                save_status(b_id, count)
-                                st.balloons()
-                                st.rerun()
+                                save_status(b_id, count); st.balloons(); st.rerun()
                         else:
                             st.button(f"🔒 {box_labels[i]}", key=f"l_{b_id}", disabled=True, use_container_width=True)
 
     else:
-        st.info(f"หน้า {st.session_state.menu} อยู่ในขั้นตอนการผลิตจ้าา")
+        st.info(f"หน้า {st.session_state.menu} กำลังสร้างอยู่นะครับ อดใจรอแป๊บนึงน้า!")
 
 else:
-    # 4. หน้า DASHBOARD หลัก (6 ปุ่ม + โชว์รูปภาพ)
+    # 4. หน้า DASHBOARD หลัก (จัดคู่ใหม่ตามสั่ง!)
     set_bg_and_style("bg_dashboard.png")
     st.markdown("<br><h3 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>Our Special Space 💖</h3>", unsafe_allow_html=True)
     
+    # เรียงลำดับใหม่ตามที่บี๋ต้องการ
     menu_items = [
-        {"id": "365days", "label": "📅 365 Days", "img": "365days.jpg"},
-        {"id": "gift", "label": "🎁 Tang's Gift", "img": "gift.jpg"},
-        {"id": "memories", "label": "📸 Memories", "img": "memories.jpg"},
-        {"id": "unseen", "label": "🎥 Unseen", "img": "unseen.jpg"},
         {"id": "quiz", "label": "🧩 Quiz", "img": "quiz.jpg"},
-        {"id": "message", "label": "💌 Message", "img": "message.jpg"}
+        {"id": "365days", "label": "📅 365 Days", "img": "365days.jpg"},
+        {"id": "memories", "label": "📸 Memories", "img": "memories.jpg"},
+        {"id": "message", "label": "💌 Message", "img": "message.jpg"},
+        {"id": "gift", "label": "🎁 Tang's Gift", "img": "gift.jpg"},
+        {"id": "unseen", "label": "🎥 Unseen", "img": "unseen.jpg"}
     ]
     
     cols = st.columns(2)
