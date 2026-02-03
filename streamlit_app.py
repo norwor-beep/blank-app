@@ -13,15 +13,16 @@ def get_saved_status():
         try:
             with open("status.txt", "r") as f:
                 lines = f.readlines()
-                return {line.split(',')[0]: line.split(',')[1].strip() for line in lines if ',' in line}
-        except: return {}
-    return {}
+                # คืนค่าเป็น List ของ box_id ที่เคยเปิดไปแล้ว
+                return [line.split(',')[0] for line in lines if ',' in line]
+        except: return []
+    return []
 
 def save_status(box_id, gift_idx):
     with open("status.txt", "a") as f:
         f.write(f"{box_id},{gift_idx}\n")
 
-# --- ฟังก์ชันจัดการพื้นหลังและสไตล์ ---
+# --- ฟังก์ชันจัดการพื้นหลัง ---
 def get_base64_of_bin_file(bin_file):
     if os.path.exists(bin_file):
         with open(bin_file, 'rb') as f:
@@ -80,65 +81,73 @@ if st.session_state.menu:
         while st.session_state.menu == "365days":
             diff = target - datetime.now()
             d, h, m, s = diff.days, diff.seconds//3600, (diff.seconds//60)%60, diff.seconds%60
-            my_html = f"""
-            <div style="text-align:center; background:rgba(255,255,255,0.85); padding:30px; border-radius:30px; box-shadow:0 10px 25px rgba(0,0,0,0.1); margin:auto;">
+            my_html = f"""<div style="text-align:center; background:rgba(255,255,255,0.85); padding:30px; border-radius:30px; box-shadow:0 10px 25px rgba(0,0,0,0.1); margin:auto;">
                 <p style="color:#FF4B4B; font-weight:bold; letter-spacing:1px; margin-bottom:15px;">COUNTING DOWN TO OUR DAY</p>
                 <div style="font-size:40px; font-weight:bold; font-family:monospace; display:flex; justify-content:center; gap:10px; color:#007BFF;">
-                    <div>{d:02d}<br><span style="font-size:10px; color:#555;">DAYS</span></div>
-                    <div style="color:#CCC;">:</div>
-                    <div>{h:02d}<br><span style="font-size:10px; color:#555;">HRS</span></div>
-                    <div style="color:#CCC;">:</div>
-                    <div>{m:02d}<br><span style="font-size:10px; color:#555;">MIN</span></div>
-                    <div style="color:#CCC;">:</div>
+                    <div>{d:02d}<br><span style="font-size:10px; color:#555;">DAYS</span></div><div style="color:#CCC;">:</div>
+                    <div>{h:02d}<br><span style="font-size:10px; color:#555;">HRS</span></div><div style="color:#CCC;">:</div>
+                    <div>{m:02d}<br><span style="font-size:10px; color:#555;">MIN</span></div><div style="color:#CCC;">:</div>
                     <div style="color:#FF4B4B;">{s:02d}<br><span style="font-size:10px; color:#555;">SEC</span></div>
-                </div>
-            </div>
-            """
+                </div></div>"""
             clock_holder.markdown(my_html, unsafe_allow_html=True)
             time.sleep(1)
 
-    # --- หน้า TANG'S GIFT ---
+    # --- หน้า TANG'S GIFT (ระบบสุ่มกล่อง แต่รันของขวัญตามลำดับ) ---
     elif st.session_state.menu == "gift":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎁 Tang's Gift</h2>", unsafe_allow_html=True)
+        
+        # ลำดับของขวัญที่บี๋ตั้งไว้
         gift_sequence = [
             {"date": "2024-02-14", "image": "gift1.jpg", "text": "ชิ้นที่ 1: รักบี๋ที่สุดในโลก! ❤️"},
             {"date": "2024-05-20", "image": "gift2.jpg", "text": "ชิ้นที่ 2: ของขวัญเซอร์ไพรส์จ้า ✨"},
             {"date": "2024-08-12", "image": "gift3.jpg", "text": "ชิ้นที่ 3: คนเก่งของเค้า 💖"},
             {"date": "2024-12-25", "image": "gift4.jpg", "text": "ชิ้นที่ 4: คริสต์มาสนี้มีแค่เรา 🎄"}
         ]
-        opened_status = get_saved_status()
+        
+        # ดึงว่ามีกล่องไหนถูกเปิดไปบ้างแล้ว
+        opened_boxes = get_saved_status() # คืนค่าเป็น list เช่น ['box_1', 'box_3']
         today = datetime.now().date()
+        
         cols = st.columns(2)
+        box_ids = ["box_1", "box_2", "box_3", "box_4"]
         box_labels = ["กล่องสีแดง 🎈", "กล่องสีฟ้า 💎", "กล่องสีทอง 🏆", "กล่องสีชมพู 🎀"]
         
-        for i in range(4):
-            b_id = f"box_{i+1}"
+        # วนลูปสร้าง 4 กล่อง
+        for i, b_id in enumerate(box_ids):
             with cols[i % 2]:
-                if b_id in opened_status:
-                    idx = int(opened_status[b_id])
-                    info = gift_sequence[idx]
+                if b_id in opened_boxes:
+                    # ถ้ากล่องนี้เคยถูกกดเปิดไปแล้ว ให้หาว่ามันคือลำดับที่เท่าไหร่ในไฟล์
+                    gift_idx = opened_boxes.index(b_id)
+                    info = gift_sequence[gift_idx]
                     st.success(f"🎉 {info['text']}")
                     if os.path.exists(info['image']):
                         st.image(info['image'], use_container_width=True)
                 else:
-                    count = len(opened_status)
-                    if count < len(gift_sequence):
-                        g_date = datetime.strptime(gift_sequence[count]['date'], "%Y-%m-%d").date()
+                    # กล่องยังไม่ถูกเปิด ให้เช็คว่า "ชิ้นถัดไป" ถึงวันเปิดหรือยัง
+                    next_gift_idx = len(opened_boxes)
+                    if next_gift_idx < len(gift_sequence):
+                        g_info = gift_sequence[next_gift_idx]
+                        g_date = datetime.strptime(g_info['date'], "%Y-%m-%d").date()
+                        
                         if today >= g_date:
                             if st.button(f"🎁 {box_labels[i]}", key=f"g_{b_id}", use_container_width=True):
-                                save_status(b_id, count); st.balloons(); st.rerun()
+                                save_status(b_id, next_gift_idx)
+                                st.balloons()
+                                st.rerun()
                         else:
                             st.button(f"🔒 {box_labels[i]}", key=f"l_{b_id}", disabled=True, use_container_width=True)
+                    else:
+                        # กรณีเปิดครบหมดทุกชิ้นแล้วแต่ยังมีกล่องเหลือ
+                        st.button(f"📦 {box_labels[i]} (ว่างเปล่า)", disabled=True, use_container_width=True)
 
     else:
-        st.info(f"หน้า {st.session_state.menu} กำลังสร้างอยู่นะครับ อดใจรอแป๊บนึงน้า!")
+        st.info(f"หน้า {st.session_state.menu} กำลังสร้างอยู่นะครับ")
 
 else:
-    # 4. หน้า DASHBOARD หลัก (จัดคู่ใหม่ตามสั่ง!)
+    # 4. หน้า DASHBOARD หลัก
     set_bg_and_style("bg_dashboard.png")
-    st.markdown("<br><h3 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>Our Special Space 💖</h3>", unsafe_allow_html=True)
+    st.markdown("<br><h3 style='text-align: center; color: white;'>Our Special Space 💖</h3>", unsafe_allow_html=True)
     
-    # เรียงลำดับใหม่ตามที่บี๋ต้องการ
     menu_items = [
         {"id": "quiz", "label": "🧩 Quiz", "img": "quiz.jpg"},
         {"id": "365days", "label": "📅 365 Days", "img": "365days.jpg"},
