@@ -7,18 +7,17 @@ import time
 # 1. ตั้งค่าหน้าจอ
 st.set_page_config(page_title="Space of Us", page_icon="💝", layout="centered")
 
-# --- ฟังก์ชันจัดการไฟล์แบบง่าย (ไม่ง้อ Google Sheets) ---
+# --- ระบบบันทึกข้อมูลแบบไฟล์ (Status.txt) ---
 def get_saved_status():
-    # อ่านข้อมูลจากไฟล์ status.txt ถ้าไม่มีให้คืนค่าว่าง
     if os.path.exists("status.txt"):
-        with open("status.txt", "r") as f:
-            lines = f.readlines()
-            # แปลงไฟล์เป็น Dictionary {box_id: gift_index}
-            return {line.split(',')[0]: line.split(',')[1].strip() for line in lines if ',' in line}
+        try:
+            with open("status.txt", "r") as f:
+                lines = f.readlines()
+                return {line.split(',')[0]: line.split(',')[1].strip() for line in lines if ',' in line}
+        except: return {}
     return {}
 
 def save_status(box_id, gift_idx):
-    # เขียนข้อมูลเพิ่มลงในไฟล์ status.txt
     with open("status.txt", "a") as f:
         f.write(f"{box_id},{gift_idx}\n")
 
@@ -54,7 +53,7 @@ if not st.session_state.authenticated:
     st.markdown('<div style="height: 150px;"></div>', unsafe_allow_html=True)
     col_l, col_mid, col_r = st.columns([1, 2, 1])
     with col_mid:
-        password = st.text_input("", type="password", placeholder="รหัสผ่านจ้า", key="login_v_final")
+        password = st.text_input("", type="password", placeholder="รหัสผ่านจ้า", key="login_pass")
         if st.button("เข้าสู่ระบบ 🤍", use_container_width=True):
             if password == "1234":
                 st.session_state.authenticated = True
@@ -63,7 +62,7 @@ if not st.session_state.authenticated:
                 st.error("รหัสผิดนะเจ้าอ้วน")
     st.stop()
 
-# 3. จัดการสถานะเมนู
+# 3. จัดการเมนู
 if 'menu' not in st.session_state:
     st.session_state.menu = None
 
@@ -80,9 +79,6 @@ if st.session_state.menu:
         target = datetime(2027, 2, 14, 0, 0, 0)
         while st.session_state.menu == "365days":
             diff = target - datetime.now()
-            if diff.total_seconds() <= 0:
-                clock_holder.markdown("<h1 style='text-align:center;'>Happy Anniversary! 💖</h1>", unsafe_allow_html=True)
-                break
             d, h, m, s = diff.days, diff.seconds//3600, (diff.seconds//60)%60, diff.seconds%60
             my_html = f"""<div style="text-align:center; background:rgba(255,255,255,0.85); padding:30px; border-radius:30px; box-shadow:0 10px 25px rgba(0,0,0,0.1); margin:auto;">
                 <p style="color:#FF4B4B; font-weight:bold; letter-spacing:1px; margin-bottom:15px;">COUNTING DOWN TO OUR DAY</p>
@@ -95,21 +91,20 @@ if st.session_state.menu:
             clock_holder.markdown(my_html, unsafe_allow_html=True)
             time.sleep(1)
 
-    # --- หน้า TANG'S GIFT (เซฟลงไฟล์ status.txt) ---
+    # --- หน้า TANG'S GIFT ---
     elif st.session_state.menu == "gift":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎁 Tang's Gift</h2>", unsafe_allow_html=True)
+        # บี๋แก้วันที่เปิดกล่องได้ที่นี่ครับ!
         gift_sequence = [
             {"date": "2024-02-14", "image": "gift1.jpg", "text": "ชิ้นที่ 1: รักบี๋ที่สุดในโลก! ❤️"},
             {"date": "2024-05-20", "image": "gift2.jpg", "text": "ชิ้นที่ 2: ของขวัญเซอร์ไพรส์จ้า ✨"},
             {"date": "2024-08-12", "image": "gift3.jpg", "text": "ชิ้นที่ 3: คนเก่งของเค้า 💖"},
             {"date": "2024-12-25", "image": "gift4.jpg", "text": "ชิ้นที่ 4: คริสต์มาสนี้มีแค่เรา 🎄"}
         ]
-        
         opened_status = get_saved_status()
         today = datetime.now().date()
         cols = st.columns(2)
         box_labels = ["กล่องสีแดง 🎈", "กล่องสีฟ้า 💎", "กล่องสีทอง 🏆", "กล่องสีชมพู 🎀"]
-        
         for i in range(4):
             b_id = f"box_{i+1}"
             with cols[i % 2]:
@@ -117,28 +112,37 @@ if st.session_state.menu:
                     idx = int(opened_status[b_id])
                     info = gift_sequence[idx]
                     st.success(f"🎉 {info['text']}")
-                    if os.path.exists(info['image']):
-                        st.image(info['image'], use_container_width=True)
+                    if os.path.exists(info['image']): st.image(info['image'], use_container_width=True)
                 else:
                     count = len(opened_status)
                     if count < len(gift_sequence):
                         g_date = datetime.strptime(gift_sequence[count]['date'], "%Y-%m-%d").date()
                         if today >= g_date:
                             if st.button(f"🎁 {box_labels[i]}", key=f"g_{b_id}", use_container_width=True):
-                                save_status(b_id, count)
-                                st.balloons()
-                                st.rerun()
-                        else:
-                            st.button(f"🔒 {box_labels[i]}", key=f"l_{b_id}", disabled=True, use_container_width=True)
+                                save_status(b_id, count); st.balloons(); st.rerun()
+                        else: st.button(f"🔒 {box_labels[i]}", key=f"l_{b_id}", disabled=True, use_container_width=True)
+
+    # --- เมนูอื่นๆ (ใส่ placeholder ไว้ก่อน) ---
+    else:
+        st.info(f"หน้า {st.session_state.menu} กำลังเตรียมข้อมูลจ้า บี๋รอแป๊บนึงนะ!")
 
 else:
-    # 4. หน้า DASHBOARD หลัก
+    # 4. หน้า DASHBOARD หลัก (กลับมาครบ 6 ปุ่ม!)
     set_bg_and_style("bg_dashboard.png")
-    st.markdown("<br><h3 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);'>ของขวัญสำหรับคนเก่ง 💖</h3>", unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("🎁 Tang's Gift", use_container_width=True):
-            st.session_state.menu = "gift"; st.rerun()
-    with c2:
-        if st.button("📅 365 Days", use_container_width=True):
-            st.session_state.menu = "365days"; st.rerun()
+    st.markdown("<br><h3 style='text-align: center; color: white;'>Our Special Space 💖</h3>", unsafe_allow_html=True)
+    
+    menu_items = [
+        {"id": "365days", "label": "📅 365 Days"},
+        {"id": "gift", "label": "🎁 Tang's Gift"},
+        {"id": "memories", "label": "📸 Memories"},
+        {"id": "unseen", "label": "🎥 Unseen"},
+        {"id": "quiz", "label": "🧩 Quiz"},
+        {"id": "message", "label": "💌 Message"}
+    ]
+    
+    cols = st.columns(2)
+    for i, item in enumerate(menu_items):
+        with cols[i % 2]:
+            if st.button(item['label'], key=f"menu_{item['id']}", use_container_width=True):
+                st.session_state.menu = item['id']
+                st.rerun()
