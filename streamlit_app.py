@@ -143,6 +143,7 @@ if st.session_state.menu:
 
     elif st.session_state.menu == "quiz":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🧩 Challenge My Love</h2>", unsafe_allow_html=True)
+        
         questions = [
             {"q": "1. เราเริ่มคุยกันตั้งแต่เดือนไหน?", "a": ["กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม"], "ans": "มีนาคม"},
             {"q": "2. หนังเรื่องแรกที่เราดูด้วยกันในโรงคือเรื่องอะไร?", "a": ["F1", "Jurassic World Rebirth", "Superman", "Zootopia"], "ans": "F1"},
@@ -150,19 +151,66 @@ if st.session_state.menu:
             {"q": "4. ข้อใดต่อไปนี้ไม่ใช่ของขวัญที่เธอเคยซื้อให้เค้า?", "a": ["กระเป๋า", "สร้อยคอ", "ต่างหู", "สร้อยข้อมือ"], "ans": "สร้อยคอ"},
             {"q": "5. ของขวัญชิ้นแรกที่เค้าให้เธอคืออะไร?", "a": ["ดอกไม้", "ตุ๊กตา", "เสื้อ", "สร้อยข้อมือ"], "ans": "เสื้อ"}
         ]
-        if 'q_idx' not in st.session_state: st.session_state.q_idx = 0
+
+        if 'q_idx' not in st.session_state:
+            st.session_state.q_idx = 0
+        
         if st.session_state.q_idx < len(questions):
             curr = questions[st.session_state.q_idx]
             st.progress(st.session_state.q_idx / len(questions))
-            st.markdown(f'<div style="background:rgba(255,255,255,0.85);padding:20px;border-radius:15px;border-left:8px solid #FF4B4B;margin-bottom:20px;"><h3>{curr["q"]}</h3></div>', unsafe_allow_html=True)
-            ans = st.radio("เลือกคำตอบ:", curr['a'], key=f"q_{st.session_state.q_idx}")
+            
+            # --- กล่องคำถาม: พื้นหลังขาวขุ่น ตัวอักษรสีน้ำตาล ---
+            st.markdown(f"""
+                <div style="background-color: rgba(255, 255, 255, 0.8); 
+                            padding: 25px; 
+                            border-radius: 20px; 
+                            border: 2px solid rgba(255, 255, 255, 0.5);
+                            backdrop-filter: blur(10px);
+                            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+                            margin-bottom: 25px;
+                            text-align: center;">
+                    <h3 style="color: #5D4037; font-family: 'Tahoma', sans-serif; margin: 0;">{curr['q']}</h3>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # --- กล่องตัวเลือก: พื้นหลังขาวขุ่นครอบตัวเลือกทั้งหมด ---
+            st.markdown('<div style="background-color: rgba(255, 255, 255, 0.6); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);">', unsafe_allow_html=True)
+            
+            # ปรับสไตล์สีตัวหนังสือใน Radio ผ่าน CSS ทั่วไป
+            st.markdown("""
+                <style>
+                div[data-testid="stRadio"] label p {
+                    color: #5D4037 !important;
+                    font-weight: bold;
+                    font-size: 18px;
+                }
+                </style>
+            """, unsafe_allow_html=True)
+            
+            ans = st.radio("เลือกคำตอบที่ถูกต้องที่สุด:", curr['a'], key=f"q_{st.session_state.q_idx}")
+            st.markdown('</div><br>', unsafe_allow_html=True)
+            
             if st.button("ยืนยันคำตอบ 🚀", use_container_width=True):
                 if ans == curr['ans']:
-                    st.success("ถูกต้องครับ! ❤️"); time.sleep(1); st.session_state.q_idx += 1; st.rerun()
-                else: st.error("ผิดนะเจ้าอ้วน!")
+                    st.success("เก่งมากกกก ถูกต้องครับ! ❤️")
+                    time.sleep(1)
+                    st.session_state.q_idx += 1
+                    st.rerun()
+                else:
+                    st.error("ผิดนะเจ้าอ้วน! ลองนึกดูดีๆ ซิ")
         else:
-            st.balloons(); st.markdown("<div style='text-align:center;background:white;padding:20px;border-radius:20px;'><h2>ยินดีด้วยครับบี๋! ❤️</h2></div>", unsafe_allow_html=True)
-            if st.button("เล่นใหม่"): st.session_state.q_idx = 0; st.rerun()
+            # ส่วนแสดงความยินดีตอนจบ
+            st.balloons()
+            st.markdown("""
+                <div style="text-align:center; background:rgba(255,255,255,0.85); padding:40px; border-radius:30px; border: 2px solid #FF4B4B;">
+                    <h2 style='color:#FF4B4B;'>🎉 ยินดีด้วยครับบี๋!</h2>
+                    <h3 style="color:#5D4037;">บี๋ตอบถูกหมดเลย เก่งที่สุดในโลก!</h3>
+                    <p style="color:#795548;">ขอบคุณที่ใส่ใจทุกรายละเอียดของเรานะ รักบี๋มากๆ เลย ❤️</p>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button("เริ่มเล่นใหม่"):
+                st.session_state.q_idx = 0
+                st.rerun()
 
     elif st.session_state.menu == "memories":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>📸 Our Memories</h2>", unsafe_allow_html=True)
