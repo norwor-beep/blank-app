@@ -144,6 +144,7 @@ if st.session_state.menu:
     elif st.session_state.menu == "quiz":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🧩 Challenge My Love</h2>", unsafe_allow_html=True)
         
+        # ... (ส่วน questions เหมือนเดิม) ...
         questions = [
             {"q": "1. เราเริ่มคุยกันตั้งแต่เดือนไหน?", "a": ["กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม"], "ans": "มีนาคม"},
             {"q": "2. หนังเรื่องแรกที่เราดูด้วยกันในโรงคือเรื่องอะไร?", "a": ["F1", "Jurassic World Rebirth", "Superman", "Zootopia"], "ans": "F1"},
@@ -159,45 +160,56 @@ if st.session_state.menu:
             curr = questions[st.session_state.q_idx]
             st.progress(st.session_state.q_idx / len(questions))
             
-            # --- กล่องคำถาม: พื้นหลังขาวขุ่น ตัวอักษรสีน้ำตาล ---
+            # --- กล่องคำถาม (บี๋บอกว่าดีแล้ว เค้าคงสไตล์เดิมไว้ครับ) ---
             st.markdown(f"""
                 <div style="background-color: rgba(255, 255, 255, 0.8); 
-                            padding: 25px; 
-                            border-radius: 20px; 
-                            border: 2px solid rgba(255, 255, 255, 0.5);
+                            padding: 20px; border-radius: 20px; 
+                            border-left: 10px solid #FF4B4B;
                             backdrop-filter: blur(10px);
-                            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-                            margin-bottom: 25px;
-                            text-align: center;">
-                    <h3 style="color: #5D4037; font-family: 'Tahoma', sans-serif; margin: 0;">{curr['q']}</h3>
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                            margin-bottom: 20px;">
+                    <h3 style="color: #5D4037; margin: 0; text-align: center;">{curr['q']}</h3>
                 </div>
             """, unsafe_allow_html=True)
             
-            # --- กล่องตัวเลือก: พื้นหลังขาวขุ่นครอบตัวเลือกทั้งหมด ---
-            st.markdown('<div style="background-color: rgba(255, 255, 255, 0.6); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);">', unsafe_allow_html=True)
-            
-            # ปรับสไตล์สีตัวหนังสือใน Radio ผ่าน CSS ทั่วไป
+            # --- กล่องคำตอบ (เพิ่มพื้นหลังขาวขุ่นครอบตัวเลือก) ---
+            # เราใช้ CSS เพื่อปรับแต่งตัวหนังสือข้างใน radio ให้เป็นสีน้ำตาลด้วยครับ
             st.markdown("""
                 <style>
+                /* ปรับสีตัวอักษรของ Radio Button */
                 div[data-testid="stRadio"] label p {
                     color: #5D4037 !important;
-                    font-weight: bold;
-                    font-size: 18px;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                }
+                /* ปรับแต่งกล่องคอนเทนเนอร์ของคำตอบ */
+                .answer-box {
+                    background-color: rgba(255, 255, 255, 0.7);
+                    padding: 25px;
+                    border-radius: 20px;
+                    border: 1px solid rgba(255, 255, 255, 0.4);
+                    backdrop-filter: blur(5px);
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
                 }
                 </style>
             """, unsafe_allow_html=True)
+
+            # สร้างกล่องขาวขุ่นคลุม Radio
+            st.markdown('<div class="answer-box">', unsafe_allow_html=True)
+            ans = st.radio("เลือกคำตอบที่ถูกต้อง:", curr['a'], key=f"q_{st.session_state.q_idx}", label_visibility="collapsed")
+            st.markdown('</div>', unsafe_allow_html=True)
             
-            ans = st.radio("เลือกคำตอบที่ถูกต้องที่สุด:", curr['a'], key=f"q_{st.session_state.q_idx}")
-            st.markdown('</div><br>', unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
             
             if st.button("ยืนยันคำตอบ 🚀", use_container_width=True):
                 if ans == curr['ans']:
-                    st.success("เก่งมากกกก ถูกต้องครับ! ❤️")
+                    st.success("ถูกต้องครับ! ❤️")
                     time.sleep(1)
                     st.session_state.q_idx += 1
                     st.rerun()
                 else:
                     st.error("ผิดนะเจ้าอ้วน! ลองนึกดูดีๆ ซิ")
+        # ... (ส่วนอื่นเหมือนเดิม) ...
         else:
             # ส่วนแสดงความยินดีตอนจบ
             st.balloons()
