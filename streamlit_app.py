@@ -20,7 +20,7 @@ def play_bg_music():
             st.markdown(audio_html, unsafe_allow_html=True)
 
 # 2. การตั้งค่าหน้าจอ
-st.set_page_config(page_title="Space of Us", page_icon="💝", layout="centered")
+st.set_page_config(page_title="คู่รักคู่แค้นคู่คี่", page_icon="💝", layout="centered")
 
 # --- ระบบจัดการไฟล์สถานะ ---
 def get_saved_status():
@@ -77,8 +77,8 @@ if not st.session_state.authenticated:
     with col_mid:
         password = st.text_input("", type="password", placeholder="รหัสผ่านจ้า", key="login_pass")
         if st.button("เข้าสู่ระบบ 🤍", use_container_width=True):
-            if password == "1234": st.session_state.authenticated = True; st.rerun()
-            else: st.error("รหัสผิดนะเจ้าอ้วน")
+            if password == "220468": st.session_state.authenticated = True; st.rerun()
+            else: st.error("กรอกรหัสใหม่ไอแกร่")
     st.stop()
 
 # --- จัดการเมนู ---
@@ -102,7 +102,7 @@ if st.session_state.menu:
         clock_holder = st.empty()
         
         # ตั้งเป้าหมายวันที่ (14 ก.พ. 2027)
-        target = datetime(2027, 2, 14, 0, 0, 0)
+        target = datetime(2026, 4, 22, 0, 0, 0)
         
         # ข้อความบอกรัก (ดึงมาข้างนอกเพื่อให้สวยงามและไม่อืด)
         love_message = """
@@ -143,10 +143,10 @@ if st.session_state.menu:
     elif st.session_state.menu == "gift":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎁 Tang's Gift</h2>", unsafe_allow_html=True)
         gift_sequence = [
-            {"date": "2024-02-14", "image": "gift1.jpg", "text": "ชิ้นที่ 1: รักบี๋ที่สุดในโลก! ❤️"},
-            {"date": "2024-05-20", "image": "gift2.jpg", "text": "ชิ้นที่ 2: ของขวัญเซอร์ไพรส์จ้า ✨"},
-            {"date": "2024-08-12", "image": "gift3.jpg", "text": "ชิ้นที่ 3: คนเก่งของเค้า 💖"},
-            {"date": "2024-12-25", "image": "gift4.jpg", "text": "ชิ้นที่ 4: คริสต์มาสนี้มีแค่เรา 🎄"}
+            {"date": "2026-02-14", "image": "gift1.jpg", "text": "ชิ้นที่ 1: ชุดเซ๊ะซี่ชอบมั๊ยจ๊ะ"},
+            {"date": "2026-02-22", "image": "gift2.jpg", "text": "ชิ้นที่ 2: บัตรตามใจ"},
+            {"date": "2026-03-22", "image": "gift3.jpg", "text": "ชิ้นที่ 3: มาแง๊นกับพี่สิจ๊ะ"},
+            {"date": "2026-04-22", "image": "gift4.jpg", "text": "ชิ้นที่ 4: รองเท้า หรือ เสื้อ ดีน๊า"}
         ]
         opened_boxes = get_saved_status()
         today = datetime.now().date()
@@ -170,7 +170,7 @@ if st.session_state.menu:
                     else: render_clickable_box(single_box_img, b_id, "🔒", disabled=True)
 
     elif st.session_state.menu == "quiz":
-        st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🧩 Challenge My Love</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🧩 จำได้มั้ยน้อ</h2>", unsafe_allow_html=True)
         
         # ... (ส่วน questions บี๋ใช้ของเดิมได้เลย) ...
         questions = [
@@ -224,21 +224,21 @@ if st.session_state.menu:
             
             if st.button("ยืนยันคำตอบ 🚀", use_container_width=True):
                 if ans == curr['ans']:
-                    st.success("เก่งมากกกก ถูกต้องครับ! ❤️")
+                    st.success("เห้ยยยย แอบเก่งนะ")
                     time.sleep(1)
                     st.session_state.q_idx += 1
                     st.rerun()
                 else:
-                    st.error("ผิดนะเจ้าอ้วน! ลองนึกดูดีๆ ซิ")
+                    st.error("แหมไอแกร่ เดี๋ยวโดน ตอบใหม่!")
         # ... (ส่วนอื่นเหมือนเดิม) ...
         else:
             # ส่วนแสดงความยินดีตอนจบ
             st.balloons()
             st.markdown("""
                 <div style="text-align:center; background:rgba(255,255,255,0.85); padding:40px; border-radius:30px; border: 2px solid #FF4B4B;">
-                    <h2 style='color:#FF4B4B;'>🎉 ยินดีด้วยครับบี๋!</h2>
-                    <h3 style="color:#5D4037;">บี๋ตอบถูกหมดเลย เก่งที่สุดในโลก!</h3>
-                    <p style="color:#795548;">ขอบคุณที่ใส่ใจทุกรายละเอียดของเรานะ รักบี๋มากๆ เลย ❤️</p>
+                    <h2 style='color:#FF4B4B;'>🎉 เก่งมากไออ้วน</h2>
+                    <h3 style="color:#5D4037;">ตอบจนถูกหมด ออกไปเอาของขวัญได้เลยสุดหล่อ</h3>
+                    <p style="color:#795548;">❤️❤️❤️❤️❤️</p>
                 </div>
             """, unsafe_allow_html=True)
             if st.button("เริ่มเล่นใหม่"):
@@ -256,7 +256,7 @@ if st.session_state.menu:
     elif st.session_state.menu == "unseen":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎥 Unseen Video</h2>", unsafe_allow_html=True)
         st.video("https://www.youtube.com/watch?v=0ZzMBohT9-I")
-        st.markdown("<p style='text-align:center;'>วิดีโอลับของเรา 🤫💖</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align:center;'>Our Memories 💖</p>", unsafe_allow_html=True)
 
     elif st.session_state.menu == "message":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>💌 My Message</h2>", unsafe_allow_html=True)
