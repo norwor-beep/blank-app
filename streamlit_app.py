@@ -183,8 +183,8 @@ if st.session_state.menu:
             """, unsafe_allow_html=True)
             
             # ถ้ามีรูปรางวัลก็โชว์ตรงนี้จ้า
-            if os.path.exists("couple_prize.jpg"):
-                st.image("couple_prize.jpg", use_container_width=True, caption="ของรางวัลสำหรับคนเก่ง ✨")
+            if os.path.exists("couple_prize.png"):
+                st.image("couple_prize.png", use_container_width=True, caption="ของรางวัลสำหรับคนเก่ง ✨")
             
             if st.button("เริ่มเล่นใหม่"):
                 st.session_state.q_idx = 0
