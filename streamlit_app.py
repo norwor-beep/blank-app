@@ -12,10 +12,10 @@ def play_bg_music():
             data = f.read()
             base64_audio = base64.b64encode(data).decode()
             
-            # --- HTML & JS สำหรับจัดการเรื่องเสียงบน iPad โดยเฉพาะ ---
+            # --- ปรับตำแหน่งปุ่มไปที่ "ขวาบน" (Top-Right) ---
             audio_html = f"""
-                <div id="music-container" style="position:fixed; bottom:20px; right:20px; z-index:9999;">
-                    <button id="music-btn" onclick="toggleMusic()" style="background:rgba(255,255,255,0.8); border:none; border-radius:50%; width:40px; height:40px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.2);">
+                <div id="music-container" style="position:fixed; top:20px; right:20px; z-index:9999;">
+                    <button id="music-btn" onclick="toggleMusic()" style="background:rgba(255,255,255,0.8); border:none; border-radius:50%; width:45px; height:45px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.2); font-size:20px;">
                         🎵
                     </button>
                 </div>
@@ -29,11 +29,10 @@ def play_bg_music():
                     var btn = document.getElementById("music-btn");
                     audio.volume = 0.5;
 
-                    // ฟังก์ชัน เปิด/ปิด
                     function toggleMusic() {{
                         if (audio.paused) {{
                             audio.play();
-                            btn.style.background = "#FF4B4B"; // เปลี่ยนสีเมื่อเล่น
+                            btn.style.background = "#FF4B4B";
                             btn.style.color = "white";
                         }} else {{
                             audio.pause();
@@ -42,7 +41,6 @@ def play_bg_music():
                         }}
                     }}
 
-                    // พยายามเล่นอัตโนมัติเมื่อมีการแตะหน้าจอครั้งแรก (ปลดล็อค iOS)
                     document.addEventListener('click', function() {{
                         if (audio.paused) {{
                             audio.play().then(() => {{
