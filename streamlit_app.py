@@ -193,16 +193,29 @@ if st.session_state.menu:
     # --- หน้า MEMORIES (ฝัง Canva) ---
     elif st.session_state.menu == "memories":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>📸 Our Memories</h2>", unsafe_allow_html=True)
-        canva_embed_code = "https://www.canva.com/design/DAHAR3m9VbM/2CtCdb7FIbKo9zBg-4Es4g/edit?utm_content=DAHAR3m9VbM&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
-        if "canva" in canva_embed_code.lower():
-            st.components.v1.html(canva_embed_code, height=500, scrolling=True)
+        
+        # บี๋เอา "HTML Embed Code" จาก Canva มาวางทับระหว่างเครื่องหมาย """ ด้านล่างนี้นะจ๊ะ
+        canva_embed_code = """<div style="position: relative; width: 100%; height: 0; padding-top: 77.2727%;
+ padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
+ border-radius: 8px; will-change: transform;">
+  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+    src="https://www.canva.com/design/DAHAR3m9VbM/dsooFGHFyMQRKRMogfab0A/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+  </iframe>
+</div>
+<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAHAR3m9VbM&#x2F;dsooFGHFyMQRKRMogfab0A&#x2F;view?utm_content=DAHAR3m9VbM&amp;
+utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Matang+Norwor</a> โดย Tell Me Ting!"""
+
+        if "<div" in canva_embed_code:
+            st.components.v1.html(canva_embed_code, height=600, scrolling=True)
         else:
             st.info("รอจดหมายรักจาก Canva ของบี๋อยู่นะจ๊ะ! ❤️")
 
-    # --- หน้า UNSEEN (YouTube) ---
+    # --- หน้า UNSEEN (YouTube Shorts Fix) ---
     elif st.session_state.menu == "unseen":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎥 Unseen Video</h2>", unsafe_allow_html=True)
-        video_url = "https://youtube.com/shorts/0ZzMBohT9-I?si=T6-IG8xCBgJVSgHn" 
+        
+        # แก้จาก /shorts/ เป็น /watch?v= เพื่อความเสถียรครับ
+        video_url = "https://www.youtube.com/watch?v=0ZzMBohT9-I?si=T6-IG8xCBgJVSgHn" 
         st.video(video_url)
         st.markdown("<p style='text-align:center;'>วิดีโอลับที่มีแค่เราสองคนที่รู้... 🤫💖</p>", unsafe_allow_html=True)
 
