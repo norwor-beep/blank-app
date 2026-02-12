@@ -109,6 +109,13 @@ if st.session_state.menu:
                     <div>{h:02d}<br><span style="font-size:10px; color:#555;">HRS</span></div>:
                     <div>{m:02d}<br><span style="font-size:10px; color:#555;">MIN</span></div>:
                     <div style="color:#FF4B4B;">{s:02d}<br><span style="font-size:10px; color:#555;">SEC</span></div>
+                </div>
+                 </div>
+
+                <div style="margin-top:20px; padding:15px; background:#F0F8FF; border-radius:15px; border:1px dashed #007BFF; color:#333; font-size:16px;">
+
+                    "อยู่ด้วยกันมาจะครบปีแล้วนะไอ่หมูอ้วน <br> อยู่ต่อ อยู่อีก ห้ามหนี ห้ามทิ้ง รักบี๋ที่สุดๆๆ ❤️"
+
                 </div></div>"""
             clock_holder.markdown(my_html, unsafe_allow_html=True); time.sleep(1)
 
