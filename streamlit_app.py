@@ -6,41 +6,56 @@ import time
 
 # --- 1. ฟังก์ชันเล่นเพลง (แก้ไขจุดบั๊ก f-string) ---
 def play_bg_music():
-    # เปลี่ยนจากอ่านไฟล์ในเครื่อง เป็นใส่ลิงก์ตรงจาก GitHub ของบี๋
-    # วิธีเอาลิงก์: ไปที่ไฟล์ใน GitHub > กดปุ่ม 'Raw' > ก๊อป URL มาวางตรงนี้
-    music_url = "https://github.com/norwor-beep/blank-app/blob/raw/main/bg_music.mp3"
+    music_file = "bg_music.mp3"
+    if os.path.exists(music_file):
+        with open(music_file, "rb") as f:
+            data = f.read()
+            base64_audio = base64.b64encode(data).decode()
+            
+            # --- ปุ่มอยู่ขวาบน และใช้ Script ที่ iPad ชอบ ---
+            audio_html = f"""
+                <div id="music-container" style="position:fixed; top:20px; right:20px; z-index:9999;">
+                    <button id="music-btn" onclick="toggleMusic()" style="background:rgba(255,255,255,0.9); border:2px solid #FF4B4B; border-radius:50%; width:45px; height:45px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.2); font-size:20px;">
+                        🎵
+                    </button>
+                </div>
 
-    audio_html = f"""
-        <div id="music-container" style="position:fixed; top:20px; right:20px; z-index:9999;">
-            <button id="music-btn" onclick="toggleMusic()" style="background:rgba(255,255,255,0.8); border:none; border-radius:50%; width:45px; height:45px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.2); font-size:20px;">
-                🎵
-            </button>
-        </div>
+                <audio id="bg-audio" loop preload="auto">
+                    <source src="data:audio/mp3;base64,{base64_audio}" type="audio/mp3">
+                </audio>
 
-        <audio id="bg-audio" loop preload="auto">
-            <source src="{music_url}" type="audio/mp3">
-        </audio>
+                <script>
+                    var audio = document.getElementById("bg-audio");
+                    var btn = document.getElementById("music-btn");
+                    audio.volume = 0.5;
 
-        <script>
-            var audio = document.getElementById("bg-audio");
-            var btn = document.getElementById("music-btn");
-            audio.volume = 0.5;
+                    function toggleMusic() {{
+                        if (audio.paused) {{
+                            audio.play();
+                            btn.style.background = "#FF4B4B";
+                            btn.style.color = "white";
+                        }} else {{
+                            audio.pause();
+                            btn.style.background = "white";
+                            btn.style.color = "black";
+                        }}
+                    }}
 
-            function toggleMusic() {{
-                if (audio.paused) {{
-                    audio.play().then(() => {{
-                        btn.style.background = "#FF4B4B";
-                        btn.style.color = "white";
-                    }}).catch(e => alert("ลองแตะหน้าจอก่อนแล้วกดปุ่มเพลงอีกครั้งนะจ๊ะ"));
-                }} else {{
-                    audio.pause();
-                    btn.style.background = "white";
-                    btn.style.color = "black";
-                }}
-            }}
-        </script>
-    """
-    st.markdown(audio_html, unsafe_allow_html=True)
+                    // ไม้ตายสำหรับ iPad: ดักจับทั้งการคลิกและการสัมผัสจอครั้งแรก
+                    function forcePlay() {{
+                        if (audio.paused) {{
+                            audio.play().then(() => {{
+                                btn.style.background = "#FF4B4B";
+                                btn.style.color = "white";
+                            }}).catch(e => console.log("Blocked"));
+                        }}
+                    }}
+
+                    document.addEventListener('click', forcePlay, {{ once: true }});
+                    document.addEventListener('touchstart', forcePlay, {{ once: true }});
+                </script>
+            """
+            st.markdown(audio_html, unsafe_allow_html=True)
 
 # 2. การตั้งค่าหน้าจอ
 st.set_page_config(page_title="คู่รักคู่แค้นคู่คี่", page_icon="💝", layout="centered")
