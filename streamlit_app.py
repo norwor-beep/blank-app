@@ -5,17 +5,26 @@ from datetime import datetime
 import time
 
 # --- 1. ฟังก์ชันเล่นเพลง (แก้ไขจุดบั๊ก f-string) ---
+# --- ปรับฟังก์ชันเพลงให้เสถียรขึ้น ---
 def play_bg_music():
     music_file = "bg_music.mp3"
     if os.path.exists(music_file):
         with open(music_file, "rb") as f:
             data = f.read()
             base64_audio = base64.b64encode(data).decode()
-            # แก้ไขตรง {{base64_audio}} ให้เหลือชั้นเดียว
+            # เพิ่ม preload="auto" เพื่อบอกให้ iPad เตรียมโหลดไฟล์ทันที
             audio_html = f"""
-                <audio autoplay loop id="bg-audio">
+                <audio autoplay loop id="bg-audio" preload="auto">
                     <source src="data:audio/mp3;base64,{base64_audio}" type="audio/mp3">
                 </audio>
+                <script>
+                    var audio = document.getElementById("bg-audio");
+                    audio.volume = 0.5; // ปรับความดัง 50% จะได้ไม่ตกใจครับ
+                    // พยายามบังคับเล่นเมื่อมีการแตะหน้าจอ
+                    document.body.addEventListener('click', function() {{
+                        audio.play();
+                    }}, {{ once: true }});
+                </script>
             """
             st.markdown(audio_html, unsafe_allow_html=True)
 
