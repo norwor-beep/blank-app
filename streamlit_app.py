@@ -5,24 +5,51 @@ from datetime import datetime
 import time
 
 # --- 1. ฟังก์ชันเล่นเพลง (แก้ไขจุดบั๊ก f-string) ---
-# --- ปรับฟังก์ชันเพลงให้เสถียรขึ้น ---
 def play_bg_music():
     music_file = "bg_music.mp3"
     if os.path.exists(music_file):
         with open(music_file, "rb") as f:
             data = f.read()
             base64_audio = base64.b64encode(data).decode()
-            # เพิ่ม preload="auto" เพื่อบอกให้ iPad เตรียมโหลดไฟล์ทันที
+            
+            # --- HTML & JS สำหรับจัดการเรื่องเสียงบน iPad โดยเฉพาะ ---
             audio_html = f"""
-                <audio autoplay loop id="bg-audio" preload="auto">
+                <div id="music-container" style="position:fixed; bottom:20px; right:20px; z-index:9999;">
+                    <button id="music-btn" onclick="toggleMusic()" style="background:rgba(255,255,255,0.8); border:none; border-radius:50%; width:40px; height:40px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.2);">
+                        🎵
+                    </button>
+                </div>
+
+                <audio id="bg-audio" loop preload="auto">
                     <source src="data:audio/mp3;base64,{base64_audio}" type="audio/mp3">
                 </audio>
+
                 <script>
                     var audio = document.getElementById("bg-audio");
-                    audio.volume = 0.5; // ปรับความดัง 50% จะได้ไม่ตกใจครับ
-                    // พยายามบังคับเล่นเมื่อมีการแตะหน้าจอ
-                    document.body.addEventListener('click', function() {{
-                        audio.play();
+                    var btn = document.getElementById("music-btn");
+                    audio.volume = 0.5;
+
+                    // ฟังก์ชัน เปิด/ปิด
+                    function toggleMusic() {{
+                        if (audio.paused) {{
+                            audio.play();
+                            btn.style.background = "#FF4B4B"; // เปลี่ยนสีเมื่อเล่น
+                            btn.style.color = "white";
+                        }} else {{
+                            audio.pause();
+                            btn.style.background = "white";
+                            btn.style.color = "black";
+                        }}
+                    }}
+
+                    // พยายามเล่นอัตโนมัติเมื่อมีการแตะหน้าจอครั้งแรก (ปลดล็อค iOS)
+                    document.addEventListener('click', function() {{
+                        if (audio.paused) {{
+                            audio.play().then(() => {{
+                                btn.style.background = "#FF4B4B";
+                                btn.style.color = "white";
+                            }}).catch(e => console.log("Autoplay blocked"));
+                        }}
                     }}, {{ once: true }});
                 </script>
             """
