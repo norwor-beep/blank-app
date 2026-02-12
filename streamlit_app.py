@@ -256,18 +256,28 @@ if st.session_state.menu:
     elif st.session_state.menu == "unseen":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎥 Unseen Video</h2>", unsafe_allow_html=True)
         
-        # เปลี่ยนจาก st.video เป็นการฝัง iframe แทน
-        video_id = "0ZzMBohT9-I" # รหัสหลัง v= ของ YouTube
-        embed_code = f"""
-            <div style="display: flex; justify-content: center;">
-                <iframe width="100%" height="315" src="https://www.youtube.com/embed/{video_id}" 
-                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen style="border-radius:15px;"></iframe>
-            </div>
-        """
-        st.components.v1.html(embed_code, height=320)
+        video_url = "https://www.youtube.com/watch?v=0ZzMBohT9-I"
         
-        st.markdown("<p style='text-align:center; margin-top:10px;'>วิดีโอลับของเรา 🤫💖</p>", unsafe_allow_html=True)
+        # 1. ใช้ระบบวิดีโอมาตรฐานของ Streamlit (ใส่พารามิเตอร์เริ่มต้น)
+        try:
+            st.video(video_url, start_time=0)
+        except:
+            st.error("ไม่สามารถโหลดวิดีโอได้โดยตรง")
+
+        # 2. เพิ่มปุ่มสำรอง (สำหรับ iPad ที่บล็อกวิดีโอ)
+        st.markdown(f"""
+            <div style="text-align:center; margin-top:20px; padding:15px; background:rgba(255,255,255,0.7); border-radius:15px;">
+                <p style="color:#5D4037;">หากวิดีโอไม่เล่น หรือขึ้นหน้าสีดำ</p>
+                <a href="{video_url}" target="_blank" style="text-decoration:none;">
+                    <button style="background-color:#FF0000; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">
+                        📺 คลิกเพื่อดูใน YouTube โดยตรง
+                    </button>
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<p style='text-align:center; margin-top:10px;'>Our Memories💖</p>", unsafe_allow_html=True)
+        
     elif st.session_state.menu == "message":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>💌 My Message</h2>", unsafe_allow_html=True)
         if os.path.exists("letter.jpg"): st.image("letter.jpg", use_container_width=True)
