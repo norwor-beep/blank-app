@@ -144,7 +144,7 @@ if st.session_state.menu:
     elif st.session_state.menu == "quiz":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🧩 Challenge My Love</h2>", unsafe_allow_html=True)
         
-        # ... (ส่วน questions เหมือนเดิม) ...
+        # ... (ส่วน questions บี๋ใช้ของเดิมได้เลย) ...
         questions = [
             {"q": "1. เราเริ่มคุยกันตั้งแต่เดือนไหน?", "a": ["กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม"], "ans": "มีนาคม"},
             {"q": "2. หนังเรื่องแรกที่เราดูด้วยกันในโรงคือเรื่องอะไร?", "a": ["F1", "Jurassic World Rebirth", "Superman", "Zootopia"], "ans": "F1"},
@@ -153,57 +153,50 @@ if st.session_state.menu:
             {"q": "5. ของขวัญชิ้นแรกที่เค้าให้เธอคืออะไร?", "a": ["ดอกไม้", "ตุ๊กตา", "เสื้อ", "สร้อยข้อมือ"], "ans": "เสื้อ"}
         ]
 
-        if 'q_idx' not in st.session_state:
-            st.session_state.q_idx = 0
+        if 'q_idx' not in st.session_state: st.session_state.q_idx = 0
         
         if st.session_state.q_idx < len(questions):
             curr = questions[st.session_state.q_idx]
             st.progress(st.session_state.q_idx / len(questions))
             
-            # --- กล่องคำถาม (บี๋บอกว่าดีแล้ว เค้าคงสไตล์เดิมไว้ครับ) ---
+            # --- กล่องคำถาม ---
             st.markdown(f"""
-                <div style="background-color: rgba(255, 255, 255, 0.8); 
-                            padding: 20px; border-radius: 20px; 
+                <div style="background-color: rgba(255, 255, 255, 0.9); 
+                            padding: 20px; border-radius: 15px; 
                             border-left: 10px solid #FF4B4B;
-                            backdrop-filter: blur(10px);
-                            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                            margin-bottom: 20px;">
-                    <h3 style="color: #5D4037; margin: 0; text-align: center;">{curr['q']}</h3>
+                            margin-bottom: 15px; text-align: center;">
+                    <h3 style="color: #5D4037; margin: 0;">{curr['q']}</h3>
                 </div>
             """, unsafe_allow_html=True)
             
-            # --- กล่องคำตอบ (เพิ่มพื้นหลังขาวขุ่นครอบตัวเลือก) ---
-            # เราใช้ CSS เพื่อปรับแต่งตัวหนังสือข้างใน radio ให้เป็นสีน้ำตาลด้วยครับ
+            # --- กล่องตัวเลือก (ใช้ CSS บังคับครอบตัว Radio เลย) ---
             st.markdown("""
                 <style>
-                /* ปรับสีตัวอักษรของ Radio Button */
+                /* บังคับสร้างกล่องสีขาวขุ่นครอบที่ตัว Radio Group */
+                div[data-testid="stRadio"] {
+                    background-color: rgba(255, 255, 255, 0.8) !important;
+                    padding: 20px !important;
+                    border-radius: 15px !important;
+                    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+                }
+                /* ปรับสีตัวอักษรของช้อยส์ให้เป็นสีน้ำตาล */
                 div[data-testid="stRadio"] label p {
                     color: #5D4037 !important;
-                    font-weight: 600;
-                    font-size: 1.1rem;
-                }
-                /* ปรับแต่งกล่องคอนเทนเนอร์ของคำตอบ */
-                .answer-box {
-                    background-color: rgba(255, 255, 255, 0.7);
-                    padding: 25px;
-                    border-radius: 20px;
-                    border: 1px solid rgba(255, 255, 255, 0.4);
-                    backdrop-filter: blur(5px);
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                    font-weight: bold !important;
+                    font-size: 1.1rem !important;
                 }
                 </style>
             """, unsafe_allow_html=True)
 
-            # สร้างกล่องขาวขุ่นคลุม Radio
-            st.markdown('<div class="answer-box">', unsafe_allow_html=True)
-            ans = st.radio("เลือกคำตอบที่ถูกต้อง:", curr['a'], key=f"q_{st.session_state.q_idx}", label_visibility="collapsed")
-            st.markdown('</div>', unsafe_allow_html=True)
+            # แสดง Radio ตามปกติ แต่ตอนนี้มันจะมีพื้นหลังขาวติดมาด้วยแล้วครับ
+            ans = st.radio("คำตอบ:", curr['a'], key=f"q_{st.session_state.q_idx}", label_visibility="collapsed")
             
             st.markdown("<br>", unsafe_allow_html=True)
             
             if st.button("ยืนยันคำตอบ 🚀", use_container_width=True):
                 if ans == curr['ans']:
-                    st.success("ถูกต้องครับ! ❤️")
+                    st.success("เก่งมากกกก ถูกต้องครับ! ❤️")
                     time.sleep(1)
                     st.session_state.q_idx += 1
                     st.rerun()
