@@ -193,7 +193,7 @@ if st.session_state.menu:
     # --- หน้า MEMORIES (ฝัง Canva) ---
     elif st.session_state.menu == "memories":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>📸 Our Memories</h2>", unsafe_allow_html=True)
-        canva_embed_code = """https://www.canva.com/design/DAHAR3m9VbM/2CtCdb7FIbKo9zBg-4Es4g/edit?utm_content=DAHAR3m9VbM&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"""
+        canva_embed_code = "https://www.canva.com/design/DAHAR3m9VbM/2CtCdb7FIbKo9zBg-4Es4g/edit?utm_content=DAHAR3m9VbM&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
         if "canva" in canva_embed_code.lower():
             st.components.v1.html(canva_embed_code, height=500, scrolling=True)
         else:
@@ -210,7 +210,7 @@ if st.session_state.menu:
     elif st.session_state.menu == "message":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>💌 My Message</h2>", unsafe_allow_html=True)
         # บี๋ทำรูปจดหมายแล้วตั้งชื่อว่า letter.png (หรือ .jpg) แล้วอัปโหลดลง GitHub นะจ๊ะ
-        letter_img = "letter.png"
+        letter_img = "letter.jpg"
         if os.path.exists(letter_img):
             st.image(letter_img, use_container_width=True)
             st.markdown("<p style='text-align:center; color:#555;'>จดหมายฉบับนี้... เขียนให้คนเก่งของเค้านะ ❤️</p>", unsafe_allow_html=True)
