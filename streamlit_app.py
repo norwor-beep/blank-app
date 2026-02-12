@@ -8,7 +8,7 @@ import time
 def play_bg_music():
     # เปลี่ยนจากอ่านไฟล์ในเครื่อง เป็นใส่ลิงก์ตรงจาก GitHub ของบี๋
     # วิธีเอาลิงก์: ไปที่ไฟล์ใน GitHub > กดปุ่ม 'Raw' > ก๊อป URL มาวางตรงนี้
-    music_url = "https://github.com/norwor-beep/blank-app/blob/main/bg_music.mp3"
+    music_url = "https://github.com/norwor-beep/blank-app/blob/raw/main/bg_music.mp3"
 
     audio_html = f"""
         <div id="music-container" style="position:fixed; top:20px; right:20px; z-index:9999;">
