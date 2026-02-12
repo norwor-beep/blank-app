@@ -255,9 +255,19 @@ if st.session_state.menu:
 
     elif st.session_state.menu == "unseen":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎥 Unseen Video</h2>", unsafe_allow_html=True)
-        st.video("https://www.youtube.com/watch?v=0ZzMBohT9-I")
-        st.markdown("<p style='text-align:center;'>Our Memories 💖</p>", unsafe_allow_html=True)
-
+        
+        # เปลี่ยนจาก st.video เป็นการฝัง iframe แทน
+        video_id = "0ZzMBohT9-I" # รหัสหลัง v= ของ YouTube
+        embed_code = f"""
+            <div style="display: flex; justify-content: center;">
+                <iframe width="100%" height="315" src="https://www.youtube.com/embed/{video_id}" 
+                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen style="border-radius:15px;"></iframe>
+            </div>
+        """
+        st.components.v1.html(embed_code, height=320)
+        
+        st.markdown("<p style='text-align:center; margin-top:10px;'>วิดีโอลับของเรา 🤫💖</p>", unsafe_allow_html=True)
     elif st.session_state.menu == "message":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>💌 My Message</h2>", unsafe_allow_html=True)
         if os.path.exists("letter.jpg"): st.image("letter.jpg", use_container_width=True)
