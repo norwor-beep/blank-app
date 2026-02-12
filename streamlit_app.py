@@ -96,28 +96,49 @@ if st.session_state.menu:
     st.divider()
 
     # --- เนื้อหาแต่ละหน้า ---
+    # --- หน้า 365 DAYS ---
     if st.session_state.menu == "365days":
+        # สร้างพื้นที่สำหรับนาฬิกา
         clock_holder = st.empty()
+        
+        # ตั้งเป้าหมายวันที่ (14 ก.พ. 2027)
         target = datetime(2027, 2, 14, 0, 0, 0)
+        
+        # ข้อความบอกรัก (ดึงมาข้างนอกเพื่อให้สวยงามและไม่อืด)
+        love_message = """
+            <div style="margin-top:20px; padding:20px; background:rgba(240, 248, 255, 0.9); 
+                        border-radius: 20px; border: 2px dashed #007BFF; 
+                        color: #5D4037; font-size: 18px; text-align: center;
+                        font-family: 'Tahoma', sans-serif; line-height: 1.6;">
+                "อยู่ด้วยกันมาจะครบปีแล้วนะไอ่หมูอ้วน <br> 
+                อยู่ต่อ อยู่อีก ห้ามหนี ห้ามทิ้ง รักบี๋ที่สุดๆๆ ❤️"
+            </div>
+        """
+
         while st.session_state.menu == "365days":
             diff = target - datetime.now()
-            d, h, m, s = diff.days, diff.seconds//3600, (diff.seconds//60)%60, diff.seconds%60
-            my_html = f"""<div style="text-align:center; background:rgba(255,255,255,0.85); padding:30px; border-radius:30px; box-shadow:0 10px 25px rgba(0,0,0,0.1); margin:auto;">
-                <p style="color:#FF4B4B; font-weight:bold; margin-bottom:15px;">COUNTING DOWN TO OUR DAY</p>
+            # คำนวณ วัน ชม. นาที วินาที
+            d = diff.days
+            h = diff.seconds // 3600
+            m = (diff.seconds // 60) % 60
+            s = diff.seconds % 60
+            
+            # HTML สำหรับนาฬิกา (แก้ tag div ที่เกินออกให้แล้วจ้า)
+            clock_html = f"""
+            <div style="text-align:center; background:rgba(255,255,255,0.85); padding:30px; border-radius:30px; box-shadow:0 10px 25px rgba(0,0,0,0.1); margin:auto;">
+                <p style="color:#FF4B4B; font-weight:bold; margin-bottom:15px; letter-spacing: 2px;">COUNTING DOWN TO OUR DAY</p>
                 <div style="font-size:40px; font-weight:bold; color:#007BFF; display:flex; justify-content:center; gap:10px;">
-                    <div>{d:02d}<br><span style="font-size:10px; color:#555;">DAYS</span></div>:
-                    <div>{h:02d}<br><span style="font-size:10px; color:#555;">HRS</span></div>:
-                    <div>{m:02d}<br><span style="font-size:10px; color:#555;">MIN</span></div>:
-                    <div style="color:#FF4B4B;">{s:02d}<br><span style="font-size:10px; color:#555;">SEC</span></div>
+                    <div>{d:02d}<br><span style="font-size:12px; color:#555;">DAYS</span></div>:
+                    <div>{h:02d}<br><span style="font-size:12px; color:#555;">HRS</span></div>:
+                    <div>{m:02d}<br><span style="font-size:12px; color:#555;">MIN</span></div>:
+                    <div style="color:#FF4B4B;">{s:02d}<br><span style="font-size:12px; color:#555;">SEC</span></div>
                 </div>
-                 </div>
-
-                <div style="margin-top:20px; padding:15px; background:#F0F8FF; border-radius:15px; border:1px dashed #007BFF; color:#333; font-size:16px;">
-
-                    "อยู่ด้วยกันมาจะครบปีแล้วนะไอ่หมูอ้วน <br> อยู่ต่อ อยู่อีก ห้ามหนี ห้ามทิ้ง รักบี๋ที่สุดๆๆ ❤️"
-
-                </div></div>"""
-            clock_holder.markdown(my_html, unsafe_allow_html=True); time.sleep(1)
+                {love_message}
+            </div>
+            """
+            
+            clock_holder.markdown(clock_html, unsafe_allow_html=True)
+            time.sleep(1)
 
     elif st.session_state.menu == "gift":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎁 Tang's Gift</h2>", unsafe_allow_html=True)
