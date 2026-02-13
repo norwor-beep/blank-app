@@ -6,16 +6,7 @@ import time
 
 import streamlit.components.v1 as components
 
-# --- ส่วนของเพลงแบบใหม่ (วางไว้บนสุดของ App หลัง Login) ---
-def play_bg_music():
-    music_file = "bg_music2.mp3"
-    if os.path.exists(music_file):
-        # สร้างคอลัมน์เพื่อให้ Player อยู่ตรงกลางสวยๆ
-        col1, col2, col3 = st.columns([1, 2, 1])
-        #with col2:
-            #st.write("🎵 กดปุ่ม Play เพื่อฟังเพลงรักนะจ๊ะ")
-            #st.audio(music_file, format="audio/mp3", loop=True)
-            #st.markdown("---") # ขีดเส้นคั่นให้ดูเป็นระเบียบ
+# --- (ลบฟังก์ชัน play_bg_music เดิมที่แสดงตรงกลางออกแล้ว) ---
 
 # 2. การตั้งค่าหน้าจอ
 st.set_page_config(page_title="คู่รักคู่แค้นคู่คี่", page_icon="💝", layout="centered")
@@ -79,7 +70,7 @@ if not st.session_state.authenticated:
             else: st.error("กรอกรหัสใหม่ไอแกร่")
     st.stop()
 
-# --- เพิ่มเติม: ส่วน Sidebar เพลง (ใส่หลังจาก Login ผ่านแล้ว) ---
+# --- ส่วน Sidebar เพลง (จะแสดงในทุกหน้าหลัง Login) ---
 with st.sidebar:
     st.write("### 🎧 Our Playlist")
     if os.path.exists("bg_music2.mp3"):
@@ -94,10 +85,6 @@ if 'menu' not in st.session_state: st.session_state.menu = None
 if st.session_state.menu:
     set_bg_and_style("bg_dashboard.png")
     
-    # เล่นเพลงถ้าไม่ใช่หน้า unseen
-    if st.session_state.menu != "unseen":
-        play_bg_music()
-
     if st.button("🔙 กลับไปหน้าเมนู"): 
         st.session_state.menu = None; st.rerun()
     st.divider()
@@ -105,13 +92,9 @@ if st.session_state.menu:
     # --- เนื้อหาแต่ละหน้า ---
     # --- หน้า 365 DAYS ---
     if st.session_state.menu == "365days":
-        # สร้างพื้นที่สำหรับนาฬิกา
         clock_holder = st.empty()
-        
-        # ตั้งเป้าหมายวันที่ (14 ก.พ. 2027)
         target = datetime(2026, 4, 22, 0, 0, 0)
         
-        # ข้อความบอกรัก (ดึงมาข้างนอกเพื่อให้สวยงามและไม่อืด)
         love_message = """
             <div style="margin-top:20px; padding:20px; background:rgba(240, 248, 255, 0.9); 
                         border-radius: 20px; border: 2px dashed #007BFF; 
@@ -124,13 +107,11 @@ if st.session_state.menu:
 
         while st.session_state.menu == "365days":
             diff = target - datetime.now()
-            # คำนวณ วัน ชม. นาที วินาที
             d = diff.days
             h = diff.seconds // 3600
             m = (diff.seconds // 60) % 60
             s = diff.seconds % 60
             
-            # HTML สำหรับนาฬิกา (แก้ tag div ที่เกินออกให้แล้วจ้า)
             clock_html = f"""
             <div style="text-align:center; background:rgba(255,255,255,0.85); padding:30px; border-radius:30px; box-shadow:0 10px 25px rgba(0,0,0,0.1); margin:auto;">
                 <p style="color:#FF4B4B; font-weight:bold; margin-bottom:15px; letter-spacing: 2px;">COUNTING DOWN TO OUR DAY</p>
@@ -143,7 +124,6 @@ if st.session_state.menu:
                 {love_message}
             </div>
             """
-            
             clock_holder.markdown(clock_html, unsafe_allow_html=True)
             time.sleep(1)
 
@@ -178,8 +158,6 @@ if st.session_state.menu:
 
     elif st.session_state.menu == "quiz":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🧩 จำได้มั้ยน้อ</h2>", unsafe_allow_html=True)
-        
-        # ... (ส่วน questions บี๋ใช้ของเดิมได้เลย) ...
         questions = [
             {"q": "1. เราเริ่มคุยกันตั้งแต่เดือนไหน?", "a": ["กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม"], "ans": "มีนาคม"},
             {"q": "2. หนังเรื่องแรกที่เราดูด้วยกันในโรงคือเรื่องอะไร?", "a": ["F1", "Jurassic World Rebirth", "Superman", "Zootopia"], "ans": "F1"},
@@ -189,101 +167,37 @@ if st.session_state.menu:
         ]
 
         if 'q_idx' not in st.session_state: st.session_state.q_idx = 0
-        
         if st.session_state.q_idx < len(questions):
             curr = questions[st.session_state.q_idx]
             st.progress(st.session_state.q_idx / len(questions))
-            
-            # --- กล่องคำถาม ---
-            st.markdown(f"""
-                <div style="background-color: rgba(255, 255, 255, 0.9); 
-                            padding: 20px; border-radius: 15px; 
-                            border-left: 10px solid #FF4B4B;
-                            margin-bottom: 15px; text-align: center;">
-                    <h3 style="color: #5D4037; margin: 0;">{curr['q']}</h3>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            # --- กล่องตัวเลือก (ใช้ CSS บังคับครอบตัว Radio เลย) ---
-            st.markdown("""
-                <style>
-                /* บังคับสร้างกล่องสีขาวขุ่นครอบที่ตัว Radio Group */
-                div[data-testid="stRadio"] {
-                    background-color: rgba(255, 255, 255, 0.8) !important;
-                    padding: 20px !important;
-                    border-radius: 15px !important;
-                    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-                }
-                /* ปรับสีตัวอักษรของช้อยส์ให้เป็นสีน้ำตาล */
-                div[data-testid="stRadio"] label p {
-                    color: #5D4037 !important;
-                    font-weight: bold !important;
-                    font-size: 1.1rem !important;
-                }
-                </style>
-            """, unsafe_allow_html=True)
-
-            # แสดง Radio ตามปกติ แต่ตอนนี้มันจะมีพื้นหลังขาวติดมาด้วยแล้วครับ
+            st.markdown(f"""<div style="background-color: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 15px; border-left: 10px solid #FF4B4B; margin-bottom: 15px; text-align: center;">
+                    <h3 style="color: #5D4037; margin: 0;">{curr['q']}</h3></div>""", unsafe_allow_html=True)
+            st.markdown("""<style>div[data-testid="stRadio"] { background-color: rgba(255, 255, 255, 0.8) !important; padding: 20px !important; border-radius: 15px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; }
+                div[data-testid="stRadio"] label p { color: #5D4037 !important; font-weight: bold !important; }</style>""", unsafe_allow_html=True)
             ans = st.radio("คำตอบ:", curr['a'], key=f"q_{st.session_state.q_idx}", label_visibility="collapsed")
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            
             if st.button("ยืนยันคำตอบ 🚀", use_container_width=True):
                 if ans == curr['ans']:
-                    st.success("เห้ยยยย แอบเก่งนะ")
-                    time.sleep(1)
-                    st.session_state.q_idx += 1
-                    st.rerun()
-                else:
-                    st.error("แหมไอแกร่ เดี๋ยวโดน ตอบใหม่!")
-        # ... (ส่วนอื่นเหมือนเดิม) ...
+                    st.success("เห้ยยยย แอบเก่งนะ"); time.sleep(1); st.session_state.q_idx += 1; st.rerun()
+                else: st.error("แหมไอแกร่ เดี๋ยวโดน ตอบใหม่!")
         else:
-            # ส่วนแสดงความยินดีตอนจบ
             st.balloons()
-            st.markdown("""
-                <div style="text-align:center; background:rgba(255,255,255,0.85); padding:40px; border-radius:30px; border: 2px solid #FF4B4B;">
-                    <h2 style='color:#FF4B4B;'>🎉 เก่งมากไออ้วน</h2>
-                    <h3 style="color:#5D4037;">ตอบจนถูกหมด ออกไปเอาของขวัญได้เลยสุดหล่อ</h3>
-                    <p style="color:#795548;">❤️❤️❤️❤️❤️</p>
-                </div>
-            """, unsafe_allow_html=True)
-            if st.button("เริ่มเล่นใหม่"):
-                st.session_state.q_idx = 0
-                st.rerun()
+            st.markdown("""<div style="text-align:center; background:rgba(255,255,255,0.85); padding:40px; border-radius:30px; border: 2px solid #FF4B4B;">
+                    <h2 style='color:#FF4B4B;'>🎉 เก่งมากไออ้วน</h2><h3 style="color:#5D4037;">ตอบจนถูกหมด ออกไปเอาของขวัญได้เลยสุดหล่อ</h3></div>""", unsafe_allow_html=True)
+            if st.button("เริ่มเล่นใหม่"): st.session_state.q_idx = 0; st.rerun()
 
     elif st.session_state.menu == "memories":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>📸 Our Memories</h2>", unsafe_allow_html=True)
         canva_code = """<div style="position: relative; width: 100%; height: 0; padding-top: 77.2727%; overflow: hidden; border-radius: 8px;">
-          <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none;"
-            src="https://www.canva.com/design/DAHAR3m9VbM/dsooFGHFyMQRKRMogfab0A/view?embed" allowfullscreen></iframe>
-        </div>"""
+          <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none;" src="https://www.canva.com/design/DAHAR3m9VbM/dsooFGHFyMQRKRMogfab0A/view?embed" allowfullscreen></iframe></div>"""
         st.components.v1.html(canva_code, height=600, scrolling=True)
 
     elif st.session_state.menu == "unseen":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>🎥 Unseen Video</h2>", unsafe_allow_html=True)
-        
         video_url = "https://www.youtube.com/watch?v=0ZzMBohT9-I"
-        
-        # 1. ใช้ระบบวิดีโอมาตรฐานของ Streamlit (ใส่พารามิเตอร์เริ่มต้น)
-        try:
-            st.video(video_url, start_time=0)
-        except:
-            st.error("ไม่สามารถโหลดวิดีโอได้โดยตรง")
-
-        # 2. เพิ่มปุ่มสำรอง (สำหรับ iPad ที่บล็อกวิดีโอ)
-        st.markdown(f"""
-            <div style="text-align:center; margin-top:20px; padding:15px; background:rgba(255,255,255,0.7); border-radius:15px;">
-                <p style="color:#5D4037;">หากวิดีโอไม่เล่น หรือขึ้นหน้าสีดำ</p>
-                <a href="{video_url}" target="_blank" style="text-decoration:none;">
-                    <button style="background-color:#FF0000; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">
-                        📺 คลิกเพื่อดูใน YouTube โดยตรง
-                    </button>
-                </a>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("<p style='text-align:center; margin-top:10px;'>Our Memories💖</p>", unsafe_allow_html=True)
+        try: st.video(video_url, start_time=0)
+        except: st.error("ไม่สามารถโหลดวิดีโอได้โดยตรง")
+        st.markdown(f"""<div style="text-align:center; margin-top:20px; padding:15px; background:rgba(255,255,255,0.7); border-radius:15px;">
+                <a href="{video_url}" target="_blank" style="text-decoration:none;"><button style="background-color:#FF0000; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">📺 คลิกเพื่อดูใน YouTube โดยตรง</button></a></div>""", unsafe_allow_html=True)
         
     elif st.session_state.menu == "message":
         st.markdown("<h2 style='text-align:center; color:#FF4B4B;'>💌 My Message</h2>", unsafe_allow_html=True)
@@ -291,9 +205,8 @@ if st.session_state.menu:
         else: st.warning("อย่าลืมอัปโหลด letter.jpg นะจ๊ะ")
 
 else:
-    # --- หน้า DASHBOARD (หน้าปุ่ม 6 ปุ่ม) ---
+    # --- หน้า DASHBOARD ---
     set_bg_and_style("bg_dashboard.png")
-    play_bg_music() 
     menu_items = [
         {"id": "quiz", "label": "🧩 Quiz", "img": "quiz.jpg"},
         {"id": "365days", "label": "📅 365 Days", "img": "365days.jpg"},
