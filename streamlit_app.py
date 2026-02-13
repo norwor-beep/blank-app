@@ -4,7 +4,8 @@ import base64
 from datetime import datetime
 import time
 
-# --- 1. ฟังก์ชันเล่นเพลง (แก้ไขจุดบั๊ก f-string) ---
+import streamlit.components.v1 as components
+
 def play_bg_music():
     music_file = "bg_music2.mp3"
     if os.path.exists(music_file):
@@ -12,10 +13,10 @@ def play_bg_music():
             data = f.read()
             base64_audio = base64.b64encode(data).decode()
             
-            # --- ปุ่มอยู่ขวาบน และใช้ Script ที่ iPad ชอบ ---
+            # ใช้การส่งไฟล์ผ่าน HTML โดยตรง ไม่ต้องโหลดทั้งหน้าใหม่
             audio_html = f"""
-                <div id="music-container" style="position:fixed; top:20px; right:20px; z-index:9999;">
-                    <button id="music-btn" onclick="toggleMusic()" style="background:rgba(255,255,255,0.9); border:2px solid #FF4B4B; border-radius:50%; width:45px; height:45px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.2); font-size:20px;">
+                <div id="music-container" style="position:fixed; top:15px; right:15px; z-index:9999;">
+                    <button id="music-btn" style="background:rgba(255,255,255,0.9); border:2px solid #FF4B4B; border-radius:50%; width:45px; height:45px; cursor:pointer; font-size:20px;">
                         🎵
                     </button>
                 </div>
@@ -29,30 +30,31 @@ def play_bg_music():
                     var btn = document.getElementById("music-btn");
                     audio.volume = 0.5;
 
-                    function toggleMusic() {{
-                        if (audio.paused) {{
-                            audio.play();
+                    function playAudio() {{
+                        audio.play().then(() => {{
                             btn.style.background = "#FF4B4B";
-                            btn.style.color = "white";
+                            btn.innerHTML = "⏸️";
+                        }}).catch(e => console.log("Blocked"));
+                    }}
+
+                    // ดักจับการจิ้มหน้าจอทุกรูปแบบ (สำหรับ iPad โดยเฉพาะ)
+                    window.addEventListener('touchstart', function() {{
+                        playAudio();
+                    }}, {{ once: true }});
+                    
+                    window.addEventListener('click', function() {{
+                        playAudio();
+                    }}, {{ once: true }});
+
+                    btn.onclick = function() {{
+                        if (audio.paused) {{
+                            playAudio();
                         }} else {{
                             audio.pause();
                             btn.style.background = "white";
-                            btn.style.color = "black";
+                            btn.innerHTML = "🎵";
                         }}
-                    }}
-
-                    // ไม้ตายสำหรับ iPad: ดักจับทั้งการคลิกและการสัมผัสจอครั้งแรก
-                    function forcePlay() {{
-                        if (audio.paused) {{
-                            audio.play().then(() => {{
-                                btn.style.background = "#FF4B4B";
-                                btn.style.color = "white";
-                            }}).catch(e => console.log("Blocked"));
-                        }}
-                    }}
-
-                    document.addEventListener('click', forcePlay, {{ once: true }});
-                    document.addEventListener('touchstart', forcePlay, {{ once: true }});
+                    }};
                 </script>
             """
             st.markdown(audio_html, unsafe_allow_html=True)
