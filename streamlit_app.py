@@ -6,7 +6,7 @@ import time
 
 # --- 1. ฟังก์ชันเล่นเพลง (แก้ไขจุดบั๊ก f-string) ---
 def play_bg_music():
-    music_file = "bg_music.mp3"
+    music_file = "bg_music2.mp3"
     if os.path.exists(music_file):
         with open(music_file, "rb") as f:
             data = f.read()
