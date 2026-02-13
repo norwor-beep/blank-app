@@ -6,58 +6,16 @@ import time
 
 import streamlit.components.v1 as components
 
+# --- ส่วนของเพลงแบบใหม่ (วางไว้บนสุดของ App หลัง Login) ---
 def play_bg_music():
     music_file = "bg_music2.mp3"
     if os.path.exists(music_file):
-        with open(music_file, "rb") as f:
-            data = f.read()
-            base64_audio = base64.b64encode(data).decode()
-            
-            # ใช้การส่งไฟล์ผ่าน HTML โดยตรง ไม่ต้องโหลดทั้งหน้าใหม่
-            audio_html = f"""
-                <div id="music-container" style="position:fixed; top:15px; right:15px; z-index:9999;">
-                    <button id="music-btn" style="background:rgba(255,255,255,0.9); border:2px solid #FF4B4B; border-radius:50%; width:45px; height:45px; cursor:pointer; font-size:20px;">
-                        🎵
-                    </button>
-                </div>
-
-                <audio id="bg-audio" loop preload="auto">
-                    <source src="data:audio/mp3;base64,{base64_audio}" type="audio/mp3">
-                </audio>
-
-                <script>
-                    var audio = document.getElementById("bg-audio");
-                    var btn = document.getElementById("music-btn");
-                    audio.volume = 0.5;
-
-                    function playAudio() {{
-                        audio.play().then(() => {{
-                            btn.style.background = "#FF4B4B";
-                            btn.innerHTML = "⏸️";
-                        }}).catch(e => console.log("Blocked"));
-                    }}
-
-                    // ดักจับการจิ้มหน้าจอทุกรูปแบบ (สำหรับ iPad โดยเฉพาะ)
-                    window.addEventListener('touchstart', function() {{
-                        playAudio();
-                    }}, {{ once: true }});
-                    
-                    window.addEventListener('click', function() {{
-                        playAudio();
-                    }}, {{ once: true }});
-
-                    btn.onclick = function() {{
-                        if (audio.paused) {{
-                            playAudio();
-                        }} else {{
-                            audio.pause();
-                            btn.style.background = "white";
-                            btn.innerHTML = "🎵";
-                        }}
-                    }};
-                </script>
-            """
-            st.markdown(audio_html, unsafe_allow_html=True)
+        # สร้างคอลัมน์เพื่อให้ Player อยู่ตรงกลางสวยๆ
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.write("🎵 กดปุ่ม Play เพื่อฟังเพลงรักนะจ๊ะ")
+            st.audio(music_file, format="audio/mp3", loop=True)
+            st.markdown("---") # ขีดเส้นคั่นให้ดูเป็นระเบียบ
 
 # 2. การตั้งค่าหน้าจอ
 st.set_page_config(page_title="คู่รักคู่แค้นคู่คี่", page_icon="💝", layout="centered")
