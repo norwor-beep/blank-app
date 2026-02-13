@@ -8,14 +8,14 @@ import streamlit.components.v1 as components
 
 # --- ส่วนของเพลงแบบใหม่ (วางไว้บนสุดของ App หลัง Login) ---
 def play_bg_music():
-    music_file = "bg_music2.mp3"
-    if os.path.exists(music_file):
-        # สร้างคอลัมน์เพื่อให้ Player อยู่ตรงกลางสวยๆ
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.write("🎵 กดปุ่ม Play เพื่อฟังเพลงรักนะจ๊ะ")
-            st.audio(music_file, format="audio/mp3", loop=True)
-            st.markdown("---") # ขีดเส้นคั่นให้ดูเป็นระเบียบ
+    music_file = "bg_music.mp3"
+    if os.path.exists(music_file):
+        # สร้างคอลัมน์เพื่อให้ Player อยู่ตรงกลางสวยๆ
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.write("🎵 กดปุ่ม Play เพื่อฟังเพลงรักนะจ๊ะ")
+            st.audio(music_file, format="audio/mp3", loop=True)
+            st.markdown("---") # ขีดเส้นคั่นให้ดูเป็นระเบียบ
 
 # 2. การตั้งค่าหน้าจอ
 st.set_page_config(page_title="คู่รักคู่แค้นคู่คี่", page_icon="💝", layout="centered")
@@ -300,4 +300,3 @@ else:
             if st.button(item['label'], key=item['id'], use_container_width=True): 
                 st.session_state.menu = item['id']
                 st.rerun()
-เพิ่มไปในโค้ดนี้ให้หน่อย แค่เพิ่มนะ ห้ามแก้อะไรในโค้ด
